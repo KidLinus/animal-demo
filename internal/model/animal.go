@@ -1,19 +1,16 @@
 package model
 
-import "time"
-
-type Gender int
-
-const (
-	Male   Gender = 0
-	Female Gender = 1
+import (
+	"time"
 )
 
 type Animal struct {
-	ID      uint64
+	ID      int
+	Dataset int
+	Removed bool
 	Born    time.Time
 	Died    *time.Time
 	Name    string
 	Gender  Gender
-	Parents map[Gender]uint64
+	Parents map[Gender]int
 }
