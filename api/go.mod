@@ -1,3 +1,4 @@
+// +heroku install ./cmd/api
 module animal.dev/animal
 
 go 1.20
