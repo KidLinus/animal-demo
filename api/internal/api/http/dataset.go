@@ -8,7 +8,7 @@ import (
 func (server *Server) datasetList(ctx api.Context, in struct {
 	ID      []int `form:"id" binding:"omitempty,min=1"`
 	Removed *bool `form:"removed" default:"false"`
-	Limit   *int  `form:"limit" binding:"omitempty,min=1,max=100"`
+	Limit   *int  `form:"limit" default:"50" binding:"omitempty,min=1,max=100"`
 }) ([]model.Dataset, error) {
 	return server.API.DatasetList(ctx, api.DatasetList(in))
 }
@@ -32,4 +32,10 @@ func (server *Server) datasetUpdate(ctx api.Context, in struct {
 	Name    *string `json:"name" binding:"omitempty,min=1"`
 }) (*model.Dataset, error) {
 	return server.API.DatasetUpdate(ctx, api.DatasetUpdate(in))
+}
+
+func (server *Server) datasetRemove(ctx api.Context, in struct {
+	ID int `uri:"id" binding:"required"`
+}) (*model.Dataset, error) {
+	return server.API.DatasetUpdate(ctx, api.DatasetUpdate{ID: in.ID, Removed: ptr(true)})
 }

@@ -3,7 +3,6 @@ package model
 import (
 	"fmt"
 	"io"
-	"os"
 
 	"github.com/dominikbraun/graph"
 	"github.com/dominikbraun/graph/draw"
@@ -13,7 +12,15 @@ type Group struct {
 	Animals map[int]Animal
 }
 
-func NewGroup() *Group { return &Group{Animals: map[int]Animal{}} }
+func NewGroup(v ...[]Animal) *Group {
+	group := &Group{Animals: map[int]Animal{}}
+	if len(v) == 1 {
+		for _, mdl := range v[0] {
+			group.AnimalAdd(mdl)
+		}
+	}
+	return group
+}
 
 func (group *Group) Validate() error {
 	return nil
@@ -90,7 +97,7 @@ func (group *Group) GraphDOT(out io.Writer) error {
 			"color": c,
 		}))
 	}
-	return draw.DOT(g, os.Stdout)
+	return draw.DOT(g, out)
 }
 
 func (group *Group) InbreedCoefficient(a, b uint64) (float64, error) {

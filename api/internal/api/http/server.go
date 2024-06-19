@@ -44,6 +44,13 @@ func New(cfg Config) (*Server, error) {
 	server.router.Handle("POST", "/dataset", endpoint(server.datasetCreate))
 	server.router.Handle("GET", "/dataset/:id", endpoint(server.datasetGet))
 	server.router.Handle("PATCH", "/dataset/:id", endpoint(server.datasetUpdate))
+	server.router.Handle("DELETE", "/dataset/:id", endpoint(server.datasetRemove))
+	server.router.Handle("GET", "/animal", endpoint(server.animalList))
+	server.router.Handle("POST", "/animal", endpoint(server.animalCreate))
+	server.router.Handle("GET", "/animal/:id", endpoint(server.animalGet))
+	server.router.Handle("PATCH", "/animal/:id", endpoint(server.animalUpdate))
+	server.router.Handle("DELETE", "/animal/:id", endpoint(server.animalRemove))
+	server.router.Handle("GET", "/animal/family", endpoint(server.animalFamily))
 	go server.router.Run(cfg.Addr...)
 	return server, nil
 }
@@ -106,3 +113,5 @@ type download struct {
 	mimetype string
 	io.ReadCloser
 }
+
+func ptr[V any](v V) *V { return &v }

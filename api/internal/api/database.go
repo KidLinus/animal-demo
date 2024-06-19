@@ -11,6 +11,10 @@ type Database interface {
 	DatasetCreate(context.Context, model.Dataset) error
 	DatasetGet(context.Context, DatabaseDatasetGet) (DatabaseDatasetIterator, error)
 	DatasetUpdate(context.Context, int, DatabaseDatasetUpdate) (*model.Dataset, error)
+
+	AnimalCreate(context.Context, model.Animal) error
+	AnimalGet(context.Context, DatabaseAnimalGet) (DatabaseAnimalIterator, error)
+	AnimalUpdate(context.Context, int, DatabaseAnimalUpdate) (*model.Animal, error)
 }
 
 type DatabaseDatasetGet struct {
@@ -25,6 +29,21 @@ type DatabaseDatasetUpdate struct {
 }
 
 type DatabaseDatasetIterator interface{ Next(*model.Dataset) error }
+
+type DatabaseAnimalGet struct {
+	ID      []int
+	Parent  []int
+	Dataset *int
+	Removed *bool
+	Limit   *int
+}
+
+type DatabaseAnimalUpdate struct {
+	Removed *bool
+	Name    *string
+}
+
+type DatabaseAnimalIterator interface{ Next(*model.Animal) error }
 
 func iterAll[V any](itr interface{ Next(*V) error }) ([]V, error) {
 	res := []V{}
