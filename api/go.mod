@@ -4,7 +4,6 @@ go 1.20
 
 require (
 	github.com/creasty/defaults v1.7.0
-	github.com/dominikbraun/graph v0.23.0
 	github.com/gin-contrib/cors v1.7.2
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-playground/validator/v10 v10.22.0

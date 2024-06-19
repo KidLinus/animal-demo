@@ -2,10 +2,6 @@ package model
 
 import (
 	"fmt"
-	"io"
-
-	"github.com/dominikbraun/graph"
-	"github.com/dominikbraun/graph/draw"
 )
 
 type Group struct {
@@ -68,37 +64,37 @@ func (group *Group) FilterFamily(id int, generations int) (*Group, error) {
 	return n, nil
 }
 
-func (group *Group) GraphDOT(out io.Writer) error {
-	g := graph.New(graph.IntHash, graph.Directed())
-	var edges []struct {
-		from   int
-		to     int
-		gender Gender
-	}
-	for _, animal := range group.Animals {
-		g.AddVertex(animal.ID, graph.VertexAttributes(map[string]string{
-			"label":  fmt.Sprintf("%d - %s", animal.ID, animal.Name),
-			"gender": animal.Gender.String(),
-		}))
-		for gender, id := range animal.Parents {
-			edges = append(edges, struct {
-				from   int
-				to     int
-				gender Gender
-			}{from: id, to: animal.ID, gender: gender})
-		}
-	}
-	for _, edge := range edges {
-		c := "red"
-		if edge.gender == Male {
-			c = "blue"
-		}
-		g.AddEdge(edge.from, edge.to, graph.EdgeAttributes(map[string]string{
-			"color": c,
-		}))
-	}
-	return draw.DOT(g, out)
-}
+// func (group *Group) GraphDOT(out io.Writer) error {
+// 	g := graph.New(graph.IntHash, graph.Directed())
+// 	var edges []struct {
+// 		from   int
+// 		to     int
+// 		gender Gender
+// 	}
+// 	for _, animal := range group.Animals {
+// 		g.AddVertex(animal.ID, graph.VertexAttributes(map[string]string{
+// 			"label":  fmt.Sprintf("%d - %s", animal.ID, animal.Name),
+// 			"gender": animal.Gender.String(),
+// 		}))
+// 		for gender, id := range animal.Parents {
+// 			edges = append(edges, struct {
+// 				from   int
+// 				to     int
+// 				gender Gender
+// 			}{from: id, to: animal.ID, gender: gender})
+// 		}
+// 	}
+// 	for _, edge := range edges {
+// 		c := "red"
+// 		if edge.gender == Male {
+// 			c = "blue"
+// 		}
+// 		g.AddEdge(edge.from, edge.to, graph.EdgeAttributes(map[string]string{
+// 			"color": c,
+// 		}))
+// 	}
+// 	return draw.DOT(g, out)
+// }
 
 func (group *Group) InbreedCoefficient(a, b uint64) (float64, error) {
 	return 0, nil
