@@ -96,7 +96,7 @@ const AnimalChart = ({ data = [] }) => {
                 }
                 return () => {
                     simulation.stop()
-                    d3Container.current.innerHTML = ''
+                    if (d3Container?.current?.innerHTML) { d3Container.current.innerHTML = '' }
                 }
             }
         }, [data, d3Container.current])

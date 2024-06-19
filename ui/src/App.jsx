@@ -1,11 +1,12 @@
-import { Button, Flex, IconButton, Spacer, Text } from '@chakra-ui/react'
+import { Button, Flex, IconButton, Spacer, Spinner, Text } from '@chakra-ui/react'
+import Input from "./Components/Input"
 import Select from "./Components/Select"
 import AnimalChart from "./Components/AnimalChart"
 import { AiOutlinePlus, AiOutlineClose } from "react-icons/ai"
 import { useEffect, useState } from 'react'
 
 const App = () => {
-  const [fields, fieldsSet] = useState({ dataset: 1, animals: [526094, 428660] })
+  const [fields, fieldsSet] = useState({  })
   const [datasets, datasetsSet] = useState({ loading: true })
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URI || "http://localhost:8666"}/dataset`).then(body => body.json())
@@ -16,7 +17,7 @@ const App = () => {
   useEffect(() => {
     if (!fields.dataset || (fields?.animals || []).length < 1) {return}
     fetch(`${import.meta.env.VITE_API_URI || "http://localhost:8666"}/animal/family?${(fields?.animals || []).map(v => `id=${v}`).join("&")}`).then(body => body.json())
-      .then(data => animalsSet({ data }))
+      .then(data => data?.errors ? animalsSet({ error: data.errors }) : animalsSet({ data }))
       .catch(error => animalsSet({ error }))
   }, [fields])
   console.log(fields, animals)
@@ -33,19 +34,26 @@ const App = () => {
         </Select>}
       </Flex>
       {!!fields.dataset && <>
-        <Flex direction="column">
+        <Flex direction="column" gap="2">
           <Text>Animals</Text>
-          {(fields?.animals || []).map(id => <Flex key={id}>
-            <Text>{id}</Text>
+          {(fields?.animals || []).map((id,idx) => <Flex key={idx}>
+            <Input value={id} onChange={n => fieldsSet({...fields, animals: fields.animals.map((v,i) => idx == i ? n : v)})} />
             <Spacer />
-            <IconButton icon={<AiOutlineClose />} size="sm" variant="ghost" />
+            <IconButton icon={<AiOutlineClose />} size="sm" variant="ghost" onClick={() => fieldsSet({...fields, animals: fields.animals.filter((_,i) => i !== idx)})} />
           </Flex>)}
-          <Button leftIcon={<AiOutlinePlus />}>Add</Button>
+          <Button leftIcon={<AiOutlinePlus />} onClick={() => fieldsSet({...fields, animals: [...(fields?.animals || []), 0]})}>Add</Button>
         </Flex>
       </>}
     </Flex>
     <Flex flexGrow="1" bg="gray.50">
-      <AnimalChart data={(animals?.data || [])} />
+      {(!fields.dataset || (fields?.animals || []).length < 1) 
+        ? <Text>Select dataset and at least 1 animal</Text>
+        : <>
+        {animals.loading && <Spinner />}
+        {!animals.loading && animals.error && <Text>Could not load animals</Text>}
+        {!animals.loading && !animals.error && animals.data.length == 0 && <Text>No animals found</Text>}
+        {!animals.loading && !animals.error && <AnimalChart data={animals.data} />}
+      </>}
     </Flex>
   </Flex>
 }
