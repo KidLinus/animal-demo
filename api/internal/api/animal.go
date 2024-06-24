@@ -70,12 +70,12 @@ func (app *App) AnimalUpdate(ctx Context, in AnimalUpdate) (*model.Animal, error
 	return res, nil
 }
 
-type AnimalFamily struct {
+type AnimalMultipleFamily struct {
 	ID       []int
 	Distance int
 }
 
-func (app *App) AnimalFamily(ctx Context, in AnimalFamily) ([]model.Animal, error) {
+func (app *App) AnimalMultipleFamily(ctx Context, in AnimalMultipleFamily) ([]model.Animal, error) {
 	res := []model.Animal{}
 	search, found := in.ID, map[int]struct{}{}
 	for i := 0; i < in.Distance; i++ {
@@ -106,4 +106,60 @@ func (app *App) AnimalFamily(ctx Context, in AnimalFamily) ([]model.Animal, erro
 		}
 	}
 	return res, nil
+}
+
+type AnimalFamily struct {
+	ID       int
+	Distance int
+}
+
+type AnimalFamilyResponse struct {
+	model.Animal
+	Family map[int]*model.Animal `json:"family"`
+}
+
+func (app *App) AnimalFamily(ctx Context, in AnimalFamily) (*AnimalFamilyResponse, error) {
+	itr, err := app.DB.AnimalGet(ctx, DatabaseAnimalGet{ID: []int{in.ID}, Limit: ptr(1)})
+	if err != nil {
+		return nil, err
+	}
+	animal, err := iterOne(itr)
+	if err != nil {
+		return nil, err
+	}
+	if animal == nil {
+		return nil, fmt.Errorf("animal not found")
+	}
+	family := map[int]*model.Animal{}
+	// Get parents
+	search := []int{}
+	for _, id := range animal.Parents {
+		search = append(search, id)
+		family[id] = nil
+	}
+	for i := 0; i < in.Distance; i++ {
+		if len(search) == 0 {
+			break
+		}
+		itr, err := app.DB.AnimalGet(ctx, DatabaseAnimalGet{ID: search})
+		if err != nil {
+			return nil, err
+		}
+		search = nil
+		parents, err := iterAll(itr)
+		if err != nil {
+			return nil, err
+		}
+		for idx, parent := range parents {
+			family[parent.ID] = &parents[idx]
+			for _, id := range parent.Parents {
+				if _, ok := family[id]; !ok {
+					search = append(search, id)
+					family[id] = nil
+				}
+			}
+		}
+	}
+	// Done
+	return &AnimalFamilyResponse{Animal: *animal, Family: family}, nil
 }

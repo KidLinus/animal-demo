@@ -43,8 +43,15 @@ func (server *Server) animalRemove(ctx api.Context, in struct {
 }
 
 func (server *Server) animalFamily(ctx api.Context, in struct {
+	ID       int `uri:"id" binding:"required"`
+	Distance int `form:"distance" default:"6" binding:"omitempty,max=10"`
+}) (*api.AnimalFamilyResponse, error) {
+	return server.API.AnimalFamily(ctx, api.AnimalFamily(in))
+}
+
+func (server *Server) animalMultipleFamily(ctx api.Context, in struct {
 	ID       []int `form:"id" binding:"required,min=1,unique"`
 	Distance int   `form:"distance" default:"6" binding:"omitempty,max=10"`
 }) ([]model.Animal, error) {
-	return server.API.AnimalFamily(ctx, api.AnimalFamily(in))
+	return server.API.AnimalMultipleFamily(ctx, api.AnimalMultipleFamily(in))
 }

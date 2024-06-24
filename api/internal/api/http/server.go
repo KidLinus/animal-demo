@@ -50,7 +50,8 @@ func New(cfg Config) (*Server, error) {
 	server.router.Handle("GET", "/animal/:id", endpoint(server.animalGet))
 	server.router.Handle("PATCH", "/animal/:id", endpoint(server.animalUpdate))
 	server.router.Handle("DELETE", "/animal/:id", endpoint(server.animalRemove))
-	server.router.Handle("GET", "/animal/family", endpoint(server.animalFamily))
+	server.router.Handle("GET", "/animal/:id/family", endpoint(server.animalFamily))
+	server.router.Handle("GET", "/animal/family", endpoint(server.animalMultipleFamily))
 	go server.router.Run(cfg.Addr...)
 	return server, nil
 }
