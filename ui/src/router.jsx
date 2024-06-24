@@ -4,6 +4,7 @@ import App from "./App"
 import Explore from "./Pages/Explore"
 import Tree from "./Pages/Tree"
 import Tree2 from "./Pages/Tree2"
+import Tree3 from "./Pages/Tree3"
 
 const NotFound = () => <Text>Page not found</Text>
 
@@ -13,6 +14,7 @@ const router = createBrowserRouter(
             <Route index element={<Explore />} />
             <Route path="tree" element={<Tree />} />
             <Route path="tree2" element={<Tree2 />} />
+            <Route path="tree3" element={<Tree3 />} />
             <Route path="*" element={<NotFound />} />
         </Route>
     ), { basename: import.meta.env.BASE_URL }

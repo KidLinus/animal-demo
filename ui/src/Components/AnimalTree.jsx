@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useLayoutEffect, useMemo } from 'react';
 import * as am5 from "@amcharts/amcharts5";
 import * as am5hierarchy from "@amcharts/amcharts5/hierarchy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
@@ -59,9 +59,9 @@ const animalFind = (animals = {}, id, depth = 0, depthMax = 5) => {
 }
 
 const AnimalTree = ({ animal = null }) => {
-    console.log("animal", animal)
+    const divID = useMemo(() => (""+Math.random()).substr(2,10), [])
     useLayoutEffect(() => {
-        let root = am5.Root.new("chartdiv");
+        let root = am5.Root.new(divID);
 
         const data = { name: animal.name, children: [
             animal?.parents?.[0] ? animalFind(animal.family, animal?.parents?.[0], 1) : animalFind({}, null, 1),
@@ -114,7 +114,7 @@ const AnimalTree = ({ animal = null }) => {
     }, []);
 
     return (
-        <div id="chartdiv" style={{ width: "100%", height: "100%" }}></div>
+        <div id={divID} style={{ width: "100%", height: "100%" }}></div>
     );
 }
 
