@@ -46,7 +46,7 @@ func TestGroupFilter(t *testing.T) {
 		t.Fatal("filter fail", err)
 	}
 	js, _ := json.MarshalIndent(filtered.Animals, "", "  ")
-	f, _ := os.Create("out.json")
+	f, _ := os.Create("filter.json")
 	defer f.Close()
 	f.Write(js)
 }
@@ -74,13 +74,24 @@ func TestAnimalInbreedingInbreedingCoefficientDistantCommon(t *testing.T) {
 	t.Log("COI", coi)
 }
 
-// func TestGroupTree2(t *testing.T) {
-// 	tree, err := groupSimple.AnimalTree("9", 10)
-// 	if err != nil {
-// 		t.Fatal("tree build fail", err)
-// 	}
-// 	js, _ := json.MarshalIndent(tree.Root, "", "  ")
-// 	f, _ := os.Create("out.json")
-// 	defer f.Close()
-// 	f.Write(js)
-// }
+func TestTreeParentsFill(t *testing.T) {
+	tree, err := groupSimple.TreeAnimalParents("9", 10, false)
+	if err != nil {
+		t.Fatal("tree build fail", err)
+	}
+	js, _ := json.MarshalIndent(tree, "", "  ")
+	f, _ := os.Create("tree.json")
+	defer f.Close()
+	f.Write(js)
+}
+
+func TestTreeChildrenFill(t *testing.T) {
+	tree, err := groupSimple.TreeAnimalChildren("1", 10)
+	if err != nil {
+		t.Fatal("tree build fail", err)
+	}
+	js, _ := json.MarshalIndent(tree, "", "  ")
+	f, _ := os.Create("tree_children.json")
+	defer f.Close()
+	f.Write(js)
+}

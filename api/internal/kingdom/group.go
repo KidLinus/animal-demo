@@ -2,23 +2,7 @@ package kingdom
 
 import (
 	"fmt"
-	"log"
 	"math"
-)
-
-type Animal struct {
-	ID      string
-	Name    string
-	Gender  Gender
-	COI     float64
-	Parents map[Gender]string
-}
-
-type Gender string
-
-const (
-	Male   Gender = "male"
-	Female Gender = "female"
 )
 
 type Group struct {
@@ -68,15 +52,27 @@ func (group *Group) FilterAnimalParents(id string, maxDepth int) (*Group, error)
 	return newGroup, nil
 }
 
-func (groupOriginal *Group) AnimalInbreedingCoefficient(id string, maxDepth int) (float64, error) {
+type AnimalInbreedingCoefficient struct {
+	Result float64
+	Paths  []AnimalInbreedingCoefficientPath
+}
+
+type AnimalInbreedingCoefficientPath struct {
+	Parent string
+	Path   []string
+	COI    float64
+	Result float64
+}
+
+func (groupOriginal *Group) AnimalInbreedingCoefficient(id string, maxDepth int) (*AnimalInbreedingCoefficient, error) {
 	// Filter out only the nodes we need
 	group, err := groupOriginal.FilterAnimalParents(id, maxDepth)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 	// Make sure that the animal exists
 	if _, ok := group.Animals[id]; !ok {
-		return 0, fmt.Errorf("animal not found")
+		return nil, fmt.Errorf("animal not found")
 	}
 	// Map animals parent dependencies
 	dependencies := map[string][]string{}
@@ -85,7 +81,7 @@ func (groupOriginal *Group) AnimalInbreedingCoefficient(id string, maxDepth int)
 			dependencies[parent] = append(dependencies[parent], animal.ID)
 		}
 	}
-	log.Println("dependencies", dependencies)
+	// log.Println("dependencies", dependencies)
 	// Determine a execution order
 	executionOrder, scheduled := []string{}, map[string]struct{}{}
 	for {
@@ -106,14 +102,14 @@ func (groupOriginal *Group) AnimalInbreedingCoefficient(id string, maxDepth int)
 			order = append(order, animal.ID)
 		}
 		if len(order) == 0 { // Circular structure, can't calculate
-			return 0, fmt.Errorf("impossible to resolve tree, circular dependencies")
+			return nil, fmt.Errorf("impossible to resolve tree, circular dependencies")
 		}
 		executionOrder = append(executionOrder, order...)
 		for _, id := range order {
 			scheduled[id] = struct{}{}
 		}
 	}
-	log.Println("executionOrder", executionOrder)
+	// log.Println("executionOrder", executionOrder)
 	// Find all path intersections through the graph
 	paths := map[string][][]string{id: {{}}}
 	intersects := map[string][][]string{}
@@ -132,7 +128,7 @@ func (groupOriginal *Group) AnimalInbreedingCoefficient(id string, maxDepth int)
 								intersectPath = append(intersectPath, path[len(path)-idx-1])
 							}
 							intersects[parentID] = append(intersects[parentID], intersectPath)
-							fmt.Println("New intersect at id:", parentID, "path:", intersectPath)
+							// fmt.Println("New intersect at id:", parentID, "path:", intersectPath)
 						}
 					}
 					newPaths = append(newPaths, append(path, parentID))
@@ -141,18 +137,32 @@ func (groupOriginal *Group) AnimalInbreedingCoefficient(id string, maxDepth int)
 			}
 		}
 	}
-	log.Println("intersects", intersects)
+	// log.Println("intersects", intersects)
 	// Calculate COI
-	var coi float64
+	res := &AnimalInbreedingCoefficient{Paths: []AnimalInbreedingCoefficientPath{}}
 	for parentID, paths := range intersects {
 		var parentCOI float64
 		if parent, ok := group.Animals[parentID]; ok {
 			parentCOI = parent.COI
 		}
-		for _, path := range paths {
-			fmt.Println("Coefficient", path, "Fx", (1 + parentCOI), " = ", math.Pow(0.5, float64(len(path))*(1+parentCOI)))
-			coi += math.Pow(0.5, float64(len(path))*(1+parentCOI))
+		for idx, path := range paths {
+			coi := math.Pow(0.5, float64(len(path))*(1+parentCOI))
+			// fmt.Println("Coefficient", path, "Fx", (1 + parentCOI), " = ", coi)
+			res.Paths = append(res.Paths, AnimalInbreedingCoefficientPath{Parent: parentID, Path: paths[idx], COI: parentCOI, Result: coi})
+			res.Result += coi
 		}
 	}
-	return coi, nil
+	// Build result
+	return res, nil
+}
+
+func (groupOriginal *Group) Merge(groupOther *Group) *Group {
+	group := NewGroup()
+	for _, v := range groupOriginal.Animals {
+		group.Add(*v)
+	}
+	for _, v := range groupOther.Animals {
+		group.Add(*v)
+	}
+	return group
 }
