@@ -142,8 +142,8 @@ func (groupOriginal *Group) AnimalInbreedingCoefficient(id string, maxDepth int)
 	res := &AnimalInbreedingCoefficient{Paths: []AnimalInbreedingCoefficientPath{}}
 	for parentID, paths := range intersects {
 		var parentCOI float64
-		if parent, ok := group.Animals[parentID]; ok {
-			parentCOI = parent.COI
+		if parent, ok := group.Animals[parentID]; ok && parent.COI != nil {
+			parentCOI = *parent.COI
 		}
 		for idx, path := range paths {
 			coi := math.Pow(0.5, float64(len(path))*(1+parentCOI))

@@ -163,3 +163,104 @@ func (app *App) AnimalFamily(ctx Context, in AnimalFamily) (*AnimalFamilyRespons
 	// Done
 	return &AnimalFamilyResponse{Animal: *animal, Family: family}, nil
 }
+
+type AnimalInbreeding struct {
+	AnimalA  int
+	AnimalB  int
+	Distance int
+}
+
+type AnimalInbreedingResponse struct {
+	AnimalA               model.Animal
+	AnimalB               model.Animal
+	InbreedingCoefficient float64
+}
+
+func (app *App) AnimalInbreeding(ctx Context, in AnimalInbreeding) (*AnimalInbreedingResponse, error) {
+	itr, err := app.DB.AnimalGet(ctx, DatabaseAnimalGet{ID: []int{in.AnimalA}, Limit: ptr(1)})
+	if err != nil {
+		return nil, err
+	}
+	animalA, err := iterOne(itr)
+	if err != nil {
+		return nil, err
+	}
+	if animalA == nil {
+		return nil, fmt.Errorf("animal not found")
+	}
+	familyA := map[int]*model.Animal{}
+	// Get parents
+	search := []int{}
+	for _, id := range animalA.Parents {
+		search = append(search, id)
+		familyA[id] = nil
+	}
+	for i := 0; i < in.Distance; i++ {
+		if len(search) == 0 {
+			break
+		}
+		itr, err := app.DB.AnimalGet(ctx, DatabaseAnimalGet{ID: search})
+		if err != nil {
+			return nil, err
+		}
+		search = nil
+		parents, err := iterAll(itr)
+		if err != nil {
+			return nil, err
+		}
+		for idx, parent := range parents {
+			familyA[parent.ID] = &parents[idx]
+			for _, id := range parent.Parents {
+				if _, ok := familyA[id]; !ok {
+					search = append(search, id)
+					familyA[id] = nil
+				}
+			}
+		}
+	}
+	itr, err = app.DB.AnimalGet(ctx, DatabaseAnimalGet{ID: []int{in.AnimalA}, Limit: ptr(1)})
+	if err != nil {
+		return nil, err
+	}
+	animalB, err := iterOne(itr)
+	if err != nil {
+		return nil, err
+	}
+	if animalB == nil {
+		return nil, fmt.Errorf("animal not found")
+	}
+	familyB := map[int]*model.Animal{}
+	// Get parents
+	search = []int{}
+	for _, id := range animalB.Parents {
+		search = append(search, id)
+		familyB[id] = nil
+	}
+	for i := 0; i < in.Distance; i++ {
+		if len(search) == 0 {
+			break
+		}
+		itr, err := app.DB.AnimalGet(ctx, DatabaseAnimalGet{ID: search})
+		if err != nil {
+			return nil, err
+		}
+		search = nil
+		parents, err := iterAll(itr)
+		if err != nil {
+			return nil, err
+		}
+		for idx, parent := range parents {
+			familyB[parent.ID] = &parents[idx]
+			for _, id := range parent.Parents {
+				if _, ok := familyB[id]; !ok {
+					search = append(search, id)
+					familyB[id] = nil
+				}
+			}
+		}
+	}
+	// Build a tree
+
+	// Done
+	return &AnimalInbreedingResponse{AnimalA: *animalA, AnimalB: *animalB, InbreedingCoefficient: 123}, nil
+}

@@ -55,3 +55,11 @@ func (server *Server) animalMultipleFamily(ctx api.Context, in struct {
 }) ([]model.Animal, error) {
 	return server.API.AnimalMultipleFamily(ctx, api.AnimalMultipleFamily(in))
 }
+
+func (server *Server) animalInbreeding(ctx api.Context, in struct {
+	AnimalA  int `form:"animal_a" binding:"required"`
+	AnimalB  int `form:"animal_b" binding:"required"`
+	Distance int `form:"distance" default:"6" binding:"omitempty,max=10"`
+}) (*api.AnimalInbreedingResponse, error) {
+	return server.API.AnimalInbreeding(ctx, api.AnimalInbreeding(in))
+}

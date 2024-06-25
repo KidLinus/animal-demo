@@ -52,6 +52,7 @@ func New(cfg Config) (*Server, error) {
 	server.router.Handle("DELETE", "/animal/:id", endpoint(server.animalRemove))
 	server.router.Handle("GET", "/animal/:id/family", endpoint(server.animalFamily))
 	server.router.Handle("GET", "/animal/family", endpoint(server.animalMultipleFamily))
+	server.router.Handle("GET", "/animal/inbreeding", endpoint(server.animalInbreeding))
 	go server.router.Run(cfg.Addr...)
 	return server, nil
 }

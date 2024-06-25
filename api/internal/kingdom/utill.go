@@ -10,3 +10,5 @@ func sliceContainsAny[V comparable](slice []V, target ...V) bool {
 	}
 	return false
 }
+
+func ptr[V any](v V) *V { return &v }

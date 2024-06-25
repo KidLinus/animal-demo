@@ -1,8 +1,6 @@
 package kingdom
 
 import (
-	"encoding/json"
-	"os"
 	"testing"
 )
 
@@ -14,7 +12,7 @@ var groupSimple = &Group{Animals: map[string]*Animal{
 	"5":  {ID: "5", Name: "5", Gender: Male, Parents: map[Gender]string{Male: "1", Female: "2"}},
 	"6":  {ID: "6", Name: "6", Gender: Female, Parents: map[Gender]string{Male: "3", Female: "4"}},
 	"7":  {ID: "7", Name: "7", Gender: Male, Parents: map[Gender]string{Male: "5", Female: "6"}},
-	"8":  {ID: "8", Name: "8", Gender: Female, COI: 0.25, Parents: map[Gender]string{Male: "5", Female: "7"}},
+	"8":  {ID: "8", Name: "8", Gender: Female, COI: ptr(0.25), Parents: map[Gender]string{Male: "5", Female: "7"}},
 	"9":  {ID: "9", Name: "9", Gender: Male, Parents: map[Gender]string{Male: "7", Female: "8"}},
 	"10": {ID: "10", Name: "10", Gender: Male, Parents: map[Gender]string{Male: "9", Female: "8"}},
 }}
@@ -41,14 +39,10 @@ var groupDistantCommon = &Group{Animals: map[string]*Animal{
 }}
 
 func TestGroupFilter(t *testing.T) {
-	filtered, err := groupSimple.FilterAnimalParents("9", 10)
+	_, err := groupSimple.FilterAnimalParents("9", 10)
 	if err != nil {
 		t.Fatal("filter fail", err)
 	}
-	js, _ := json.MarshalIndent(filtered.Animals, "", "  ")
-	f, _ := os.Create("filter.json")
-	defer f.Close()
-	f.Write(js)
 }
 
 func TestAnimalInbreedingInbreedingCoefficientBasic(t *testing.T) {
@@ -75,23 +69,15 @@ func TestAnimalInbreedingInbreedingCoefficientDistantCommon(t *testing.T) {
 }
 
 func TestTreeParentsFill(t *testing.T) {
-	tree, err := groupSimple.TreeAnimalParents("9", 10, false)
+	_, err := groupSimple.TreeAnimalParents("9", 10, false)
 	if err != nil {
 		t.Fatal("tree build fail", err)
 	}
-	js, _ := json.MarshalIndent(tree, "", "  ")
-	f, _ := os.Create("tree.json")
-	defer f.Close()
-	f.Write(js)
 }
 
 func TestTreeChildrenFill(t *testing.T) {
-	tree, err := groupSimple.TreeAnimalChildren("1", 10)
+	_, err := groupSimple.TreeAnimalChildren("1", 10)
 	if err != nil {
 		t.Fatal("tree build fail", err)
 	}
-	js, _ := json.MarshalIndent(tree, "", "  ")
-	f, _ := os.Create("tree_children.json")
-	defer f.Close()
-	f.Write(js)
 }
