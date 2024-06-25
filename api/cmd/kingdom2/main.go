@@ -28,7 +28,7 @@ var animals = map[string]*kingdom.Animal{
 func main() {
 	db := &db{animals: animals}
 	api := kingdom.API{DB: db}
-	tree, err := api.AnimalGetParentTree(context.Background(), kingdom.APIAnimalGetParentTreeInput{ID: "10", Depth: 20})
+	tree, err := api.AnimalsGetParentTree(context.Background(), kingdom.APIAnimalsGetParentTreeInput{A: "10", B: "7", Depth: 20})
 	if err != nil {
 		log.Fatalln("tree get fail", err)
 	}

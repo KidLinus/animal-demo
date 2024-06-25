@@ -6,19 +6,19 @@ import (
 )
 
 type Animal struct {
-	ID        string
-	IDs       map[string][]string
-	Created   time.Time
-	Updated   time.Time
-	Removed   bool
-	Name      string
-	Nicknames []string
-	Gender    Gender
-	Country   *string
-	COI       *float64
-	Born      *time.Time
-	Deceased  *time.Time
-	Parents   map[Gender]string
+	ID        string              `json:"id"`
+	IDs       map[string][]string `json:"ids"`
+	Created   time.Time           `json:"created"`
+	Updated   time.Time           `json:"updated"`
+	Removed   bool                `json:"removed"`
+	Name      string              `json:"name"`
+	Nicknames []string            `json:"nicknames"`
+	Gender    Gender              `json:"gender"`
+	Country   *string             `json:"country"`
+	COI       *float64            `json:"coi"`
+	Born      *time.Time          `json:"born"`
+	Deceased  *time.Time          `json:"deceased"`
+	Parents   map[Gender]string   `json:"parents"`
 }
 
 type Gender string

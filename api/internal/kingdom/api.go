@@ -15,9 +15,13 @@ type APIDatabase interface {
 	List(context.Context, AnimalFilter) (AnimalIterator, error)
 }
 
-type APIAnimalSearchInput struct{ Query string }
+type APIAnimalSearchInput struct {
+	Query string `form:"query"`
+}
 
-type APIAnimalSearchResult struct{ Items []Animal }
+type APIAnimalSearchResult struct {
+	Items []Animal `json:"items"`
+}
 
 func (api *API) AnimalSearch(ctx context.Context, in APIAnimalSearchInput) (*APIAnimalSearchResult, error) {
 	itr, err := api.DB.List(ctx, AnimalFilter{Query: &in.Query, Limit: ptr(10)})
@@ -38,25 +42,29 @@ func (api *API) AnimalSearch(ctx context.Context, in APIAnimalSearchInput) (*API
 	return &APIAnimalSearchResult{Items: items}, nil
 }
 
-func (api *API) AnimalGet(ctx context.Context, id string) (*Animal, error) {
-	v, err := api.DB.Get(ctx, id)
+type APIAnimalGetInput struct {
+	ID string `uri:"id"`
+}
+
+func (api *API) AnimalGet(ctx context.Context, in APIAnimalGetInput) (*Animal, error) {
+	v, err := api.DB.Get(ctx, in.ID)
 	if err != nil {
 		return nil, err
 	}
 	if v == nil {
-		return nil, fmt.Errorf("animal %s not found", id)
+		return nil, fmt.Errorf("animal %s not found", in.ID)
 	}
 	return v, nil
 }
 
 type APIAnimalGetParentsInput struct {
-	ID          string
-	Depth       int
-	FillUnknown bool
+	ID          string `uri:"id"`
+	Depth       int    `form:"depth" default:"10"`
+	FillUnknown bool   `form:"fill_unknown"`
 }
 
 func (api *API) AnimalGetParents(ctx context.Context, in APIAnimalGetParentsInput) (*Group, error) {
-	animal, err := api.AnimalGet(ctx, in.ID)
+	animal, err := api.AnimalGet(ctx, APIAnimalGetInput{ID: in.ID})
 	if err != nil {
 		return nil, err
 	}
@@ -99,13 +107,16 @@ func (api *API) AnimalGetParents(ctx context.Context, in APIAnimalGetParentsInpu
 }
 
 type APIAnimalGetParentTreeInput struct {
-	ID          string
-	Depth       int
-	FillUnknown bool
+	ID          string `uri:"id"`
+	Depth       int    `form:"depth" default:"10"`
+	FillUnknown bool   `form:"fill_unknown"`
 }
 
 func (api *API) AnimalGetParentTree(ctx context.Context, in APIAnimalGetParentTreeInput) (*Tree, error) {
-	group, err := api.AnimalGetParents(ctx, APIAnimalGetParentsInput{ID: in.ID, Depth: in.Depth, FillUnknown: in.FillUnknown})
+	group, err := api.AnimalGetParents(ctx, APIAnimalGetParentsInput(in))
+	if err != nil {
+		return nil, err
+	}
 	tree, err := group.TreeAnimalParents(in.ID, in.Depth, in.FillUnknown)
 	if err != nil {
 		return nil, err
@@ -113,9 +124,34 @@ func (api *API) AnimalGetParentTree(ctx context.Context, in APIAnimalGetParentTr
 	return tree, nil
 }
 
+type APIAnimalsGetParentTreeInput struct {
+	A           string `form:"a"`
+	B           string `form:"b"`
+	Depth       int    `form:"depth" default:"10"`
+	FillUnknown bool   `form:"fill_unknown"`
+}
+
+func (api *API) AnimalsGetParentTree(ctx context.Context, in APIAnimalsGetParentTreeInput) (*Tree, error) {
+	groupA, err := api.AnimalGetParents(ctx, APIAnimalGetParentsInput{ID: in.A, Depth: in.Depth, FillUnknown: in.FillUnknown})
+	if err != nil {
+		return nil, err
+	}
+	groupB, err := api.AnimalGetParents(ctx, APIAnimalGetParentsInput{ID: in.B, Depth: in.Depth, FillUnknown: in.FillUnknown})
+	if err != nil {
+		return nil, err
+	}
+	group := groupA.Merge(groupB)
+	group.Add(Animal{ID: "child", IDs: map[string][]string{}, Name: "Child", Parents: map[Gender]string{Male: in.A, Female: in.B}})
+	tree, err := group.TreeAnimalParents("child", in.Depth, in.FillUnknown)
+	if err != nil {
+		return nil, err
+	}
+	return tree, nil
+}
+
 type APIAnimalGetCOIInput struct {
-	ID    string
-	Depth int
+	ID    string `uri:"id"`
+	Depth int    `form:"depth" default:"10"`
 }
 
 func (api *API) AnimalGetCOI(ctx context.Context, in APIAnimalGetCOIInput) (*AnimalInbreedingCoefficient, error) {
@@ -124,4 +160,24 @@ func (api *API) AnimalGetCOI(ctx context.Context, in APIAnimalGetCOIInput) (*Ani
 		return nil, err
 	}
 	return group.AnimalInbreedingCoefficient(in.ID, in.Depth)
+}
+
+type APIAnimalsGetCOIInput struct {
+	A     string `form:"a"`
+	B     string `form:"b"`
+	Depth int    `form:"depth" default:"10"`
+}
+
+func (api *API) AnimalsGetCOI(ctx context.Context, in APIAnimalsGetCOIInput) (*AnimalInbreedingCoefficient, error) {
+	groupA, err := api.AnimalGetParents(ctx, APIAnimalGetParentsInput{ID: in.A, Depth: in.Depth})
+	if err != nil {
+		return nil, err
+	}
+	groupB, err := api.AnimalGetParents(ctx, APIAnimalGetParentsInput{ID: in.B, Depth: in.Depth})
+	if err != nil {
+		return nil, err
+	}
+	group := groupA.Merge(groupB)
+	group.Add(Animal{ID: "child", IDs: map[string][]string{}, Name: "Child", Parents: map[Gender]string{Male: in.A, Female: in.B}})
+	return group.AnimalInbreedingCoefficient("child", in.Depth)
 }

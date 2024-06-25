@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"io"
+	"log"
 
 	"animal.dev/animal/internal/kingdom"
 )
@@ -23,8 +25,12 @@ var animals = map[string]*kingdom.Animal{
 func main() {
 	db := &db{animals: animals}
 	api := kingdom.API{DB: db}
-	gin := api.Gin([]string{"*"})
-	gin.Run(":8667")
+	coi, err := api.AnimalGetCOI(context.Background(), kingdom.APIAnimalGetCOIInput{ID: "9", Depth: 20})
+	if err != nil {
+		log.Fatalln("tree get fail", err)
+	}
+	js, _ := json.MarshalIndent(coi, "", "  ")
+	log.Println(string(js))
 }
 
 type db struct {

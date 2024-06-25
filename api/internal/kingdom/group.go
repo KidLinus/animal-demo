@@ -6,7 +6,7 @@ import (
 )
 
 type Group struct {
-	Animals map[string]*Animal
+	Animals map[string]*Animal `json:"animal"`
 }
 
 func NewGroup(animals ...Animal) *Group {
@@ -53,15 +53,15 @@ func (group *Group) FilterAnimalParents(id string, maxDepth int) (*Group, error)
 }
 
 type AnimalInbreedingCoefficient struct {
-	Result float64
-	Paths  []AnimalInbreedingCoefficientPath
+	Result float64                           `json:"result"`
+	Paths  []AnimalInbreedingCoefficientPath `json:"paths"`
 }
 
 type AnimalInbreedingCoefficientPath struct {
-	Parent string
-	Path   []string
-	COI    float64
-	Result float64
+	Parent string   `json:"parent"`
+	Path   []string `json:"path"`
+	COI    float64  `json:"coi"`
+	Result float64  `json:"result"`
 }
 
 func (groupOriginal *Group) AnimalInbreedingCoefficient(id string, maxDepth int) (*AnimalInbreedingCoefficient, error) {
