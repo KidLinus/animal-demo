@@ -9,22 +9,22 @@ import (
 )
 
 var animals = map[string]*kingdom.Animal{
-	"1":  {ID: "1", Name: "1", Gender: kingdom.Male, Parents: map[kingdom.Gender]string{}},
-	"2":  {ID: "2", Name: "2", Gender: kingdom.Female, Parents: map[kingdom.Gender]string{}},
-	"3":  {ID: "3", Name: "3", Gender: kingdom.Male, Parents: map[kingdom.Gender]string{}},
-	"4":  {ID: "4", Name: "4", Gender: kingdom.Female, Parents: map[kingdom.Gender]string{}},
-	"5":  {ID: "5", Name: "5", Gender: kingdom.Male, Parents: map[kingdom.Gender]string{kingdom.Male: "1", kingdom.Female: "2"}},
-	"6":  {ID: "6", Name: "6", Gender: kingdom.Female, Parents: map[kingdom.Gender]string{kingdom.Male: "3", kingdom.Female: "4"}},
-	"7":  {ID: "7", Name: "7", Gender: kingdom.Male, Parents: map[kingdom.Gender]string{kingdom.Male: "5", kingdom.Female: "6"}},
-	"8":  {ID: "8", Name: "8", Gender: kingdom.Female, Parents: map[kingdom.Gender]string{kingdom.Male: "5", kingdom.Female: "7"}},
-	"9":  {ID: "9", Name: "9", Gender: kingdom.Male, Parents: map[kingdom.Gender]string{kingdom.Male: "7", kingdom.Female: "8"}},
-	"10": {ID: "10", Name: "10", Gender: kingdom.Male, Parents: map[kingdom.Gender]string{kingdom.Male: "9", kingdom.Female: "8"}},
+	"1":  {ID: "1", Name: "Fluffy", Gender: kingdom.Male, Parents: map[kingdom.Gender]string{}},
+	"2":  {ID: "2", Name: "Tipsy", Gender: kingdom.Female, Parents: map[kingdom.Gender]string{}},
+	"3":  {ID: "3", Name: "Shiro", Gender: kingdom.Male, Parents: map[kingdom.Gender]string{}},
+	"4":  {ID: "4", Name: "Maja", Gender: kingdom.Female, Parents: map[kingdom.Gender]string{}},
+	"5":  {ID: "5", Name: "Oreo", Gender: kingdom.Male, Parents: map[kingdom.Gender]string{kingdom.Male: "1", kingdom.Female: "2"}},
+	"6":  {ID: "6", Name: "Luna", Gender: kingdom.Female, Parents: map[kingdom.Gender]string{kingdom.Male: "3", kingdom.Female: "4"}},
+	"7":  {ID: "7", Name: "Luffsen", Gender: kingdom.Male, Parents: map[kingdom.Gender]string{kingdom.Male: "5", kingdom.Female: "6"}},
+	"8":  {ID: "8", Name: "Missy", Gender: kingdom.Female, Parents: map[kingdom.Gender]string{kingdom.Male: "5", kingdom.Female: "7"}},
+	"9":  {ID: "9", Name: "Lennart", Gender: kingdom.Male, Parents: map[kingdom.Gender]string{kingdom.Male: "7", kingdom.Female: "8"}},
+	"10": {ID: "10", Name: "Dobby", Gender: kingdom.Male, Parents: map[kingdom.Gender]string{kingdom.Male: "9", kingdom.Female: "8"}},
 }
 
 func main() {
 	db := &db{animals: animals}
 	api := kingdom.API{DB: db}
-	gin := api.Gin([]string{"*"})
+	gin := api.Gin([]string{"http://localhost:5173"})
 	gin.Run(":8667")
 }
 

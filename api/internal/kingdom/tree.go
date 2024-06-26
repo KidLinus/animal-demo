@@ -3,12 +3,12 @@ package kingdom
 import "fmt"
 
 type Tree struct {
-	Root *TreeAnimal
+	Root *TreeAnimal `json:"root"`
 }
 
 type TreeAnimal struct {
-	Animal   *Animal
-	Children []*TreeAnimal
+	Animal   *Animal       `json:"animal"`
+	Children []*TreeAnimal `json:"children"`
 }
 
 func (group *Group) TreeAnimalParents(id string, maxDepth int, fillUnknown bool) (*Tree, error) {
