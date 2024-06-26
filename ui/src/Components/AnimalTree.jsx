@@ -3,10 +3,16 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5hierarchy from "@amcharts/amcharts5/hierarchy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
-const proccess = data => ({...data.animal, color: data.animal.gender == "male" ? "#5af":"#f66", children: (data?.children || []).map(proccess)})
+const genders = { male: "#5af", female: "#f66" }
+
+const proccess = data => ({
+    ...data.animal,
+    color: genders[data.animal.gender] || "#666",
+    children: (data?.children || []).map(proccess),
+})
 
 const AnimalTree = ({ data: dataInput = {} }) => {
-    const divID = useMemo(() => (""+Math.random()).substr(2,10), [])
+    const divID = useMemo(() => ("" + Math.random()).substr(2, 10), [])
     useLayoutEffect(() => {
         let root = am5.Root.new(divID);
 

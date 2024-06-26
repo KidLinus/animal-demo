@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { useApiQuery } from "../Hooks/api"
 import { IoMdFemale, IoMdMale } from "react-icons/io"
 import AnimalTree from "../Components/AnimalTree"
+import { IoMaleFemale } from "react-icons/io5"
 
 const Animal = () => {
     const { id } = useParams()
@@ -22,6 +23,7 @@ const Animal = () => {
             <Flex gap="2" align="center">
                 {animal.gender == "male" && <IoMdMale color="blue" />}
                 {animal.gender == "female" && <IoMdFemale color="red" />}
+                {animal.gender == "" && <IoMaleFemale color="#333" />}
                 <Text>{animal.name}</Text>
             </Flex>
             <Text fontWeight="bold">Information</Text>

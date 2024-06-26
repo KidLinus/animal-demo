@@ -2,12 +2,13 @@ import { AspectRatio, Button, Flex, Progress, Stat, StatHelpText, StatLabel, Sta
 import { useNavigate, useParams } from "react-router-dom"
 import { useApiQuery } from "../Hooks/api"
 import { IoMdFemale, IoMdMale } from "react-icons/io"
+import { IoMaleFemale } from "react-icons/io5"
 import AnimalTree from "../Components/AnimalTree"
 
 const Child = () => {
     const { a, b } = useParams()
     const nav = useNavigate()
-    const animal = { id: "temporary", name: "Potential Child", gender: "male", parents: { male: a, female: b } }
+    const animal = { id: "temporary", name: "Potential Child", gender: "", parents: { male: a, female: b } }
     const tree = useApiQuery({ path: `/animal/parents`, query: { a, b } }, { enabled: !!animal })
     const coi = useApiQuery({ path: `/animal/coi`, query: { a, b } }, { enabled: !!animal })
     return <Flex w="full" h="full" direction="column" p="2" gap="2">
@@ -15,6 +16,7 @@ const Child = () => {
             <Flex gap="2" align="center">
                 {animal.gender == "male" && <IoMdMale color="blue" />}
                 {animal.gender == "female" && <IoMdFemale color="red" />}
+                {animal.gender == "" && <IoMaleFemale color="#333" />}
                 <Text>{animal.name}</Text>
             </Flex>
             <Text fontWeight="bold">Information</Text>
