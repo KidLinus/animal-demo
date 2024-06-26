@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"io"
+	"strings"
 
 	"animal.dev/animal/internal/kingdom"
 )
@@ -38,11 +39,15 @@ func (db *db) Get(_ context.Context, id string) (*kingdom.Animal, error) {
 func (db *db) List(_ context.Context, filter kingdom.AnimalFilter) (kingdom.AnimalIterator, error) {
 	itr := &dbItr{}
 	for _, animal := range db.animals {
-		for _, id := range filter.IDs {
-			if animal.ID == id {
-				itr.items = append(itr.items, *animal)
+		if filter.IDs != nil && !sliceContainsAny(filter.IDs, animal.ID) {
+			continue
+		}
+		if filter.Query != nil {
+			if !strings.Contains(animal.Name, *filter.Query) {
+				continue
 			}
 		}
+		itr.items = append(itr.items, *animal)
 	}
 	return itr, nil
 }
@@ -59,4 +64,15 @@ func (itr *dbItr) Next(v *kingdom.Animal) error {
 	*v = itr.items[itr.index]
 	itr.index++
 	return nil
+}
+
+func sliceContainsAny[V comparable](slice []V, target ...V) bool {
+	for _, v := range slice {
+		for _, t := range target {
+			if v == t {
+				return true
+			}
+		}
+	}
+	return false
 }

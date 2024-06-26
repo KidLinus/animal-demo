@@ -1,4 +1,4 @@
-// +heroku install ./cmd/api
+// +heroku install ./cmd/kingdom
 module animal.dev/animal
 
 go 1.20
