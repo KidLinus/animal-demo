@@ -4,13 +4,16 @@ import { useApiQuery } from "../Hooks/api"
 import { IoMdFemale, IoMdMale } from "react-icons/io"
 import { IoMaleFemale } from "react-icons/io5"
 import AnimalTree from "../Components/AnimalTree"
+import { useState } from "react"
+import Input from "../Components/Input"
 
 const Child = () => {
     const { a, b } = useParams()
     const nav = useNavigate()
+    const [depth, depthSet] = useState("6")
     const animal = { id: "temporary", name: "Potential Child", gender: "", parents: { male: a, female: b } }
-    const tree = useApiQuery({ path: `/animal/parents`, query: { a, b, depth: 6 } }, { enabled: !!animal })
-    const coi = useApiQuery({ path: `/animal/coi`, query: { a, b, depth: 6 } }, { enabled: !!animal })
+    const tree = useApiQuery({ path: `/animal/parents`, query: { a, b, depth: Math.min(parseInt(depth, 10), 14) } }, { enabled: !!animal && parseInt(depth, 10) > 0 })
+    const coi = useApiQuery({ path: `/animal/coi`, query: { a, b, depth: Math.min(parseInt(depth, 10), 14) } }, { enabled: !!animal && parseInt(depth, 10) > 0 })
     return <Flex w="full" h="full" direction="column" p="2" gap="2">
         <Flex direction="column" gap="2">
             <Flex gap="2" align="center">
@@ -51,6 +54,8 @@ const Child = () => {
                     </Tbody>
                 </Table>
             </Flex> : <Progress isIndeterminate />}
+            <Text fontWeight="bold">Analysis Depth (max 14)</Text>
+            <Input label="Depth" type="number" min="1" value={depth} onChange={depthSet} maxW="150px" />
             <Flex>
                 <Button colorScheme="blue" onClick={() => nav("/")}>Go back</Button>
             </Flex>
