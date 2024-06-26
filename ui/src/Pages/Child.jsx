@@ -9,8 +9,8 @@ const Child = () => {
     const { a, b } = useParams()
     const nav = useNavigate()
     const animal = { id: "temporary", name: "Potential Child", gender: "", parents: { male: a, female: b } }
-    const tree = useApiQuery({ path: `/animal/parents`, query: { a, b } }, { enabled: !!animal })
-    const coi = useApiQuery({ path: `/animal/coi`, query: { a, b } }, { enabled: !!animal })
+    const tree = useApiQuery({ path: `/animal/parents`, query: { a, b, depth: 6 } }, { enabled: !!animal })
+    const coi = useApiQuery({ path: `/animal/coi`, query: { a, b, depth: 6 } }, { enabled: !!animal })
     return <Flex w="full" h="full" direction="column" p="2" gap="2">
         <Flex direction="column" gap="2">
             <Flex gap="2" align="center">

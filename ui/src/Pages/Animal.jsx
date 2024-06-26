@@ -9,8 +9,8 @@ const Animal = () => {
     const { id } = useParams()
     const nav = useNavigate()
     const { data: animal, error, isPending } = useApiQuery({ path: `/animal/${id}` })
-    const tree = useApiQuery({ path: `/animal/${id}/parents` }, { enabled: !!animal })
-    const coi = useApiQuery({ path: `/animal/${id}/coi` }, { enabled: !!animal })
+    const tree = useApiQuery({ path: `/animal/${id}/parents`, query: { depth: 6 } }, { enabled: !!animal })
+    const coi = useApiQuery({ path: `/animal/${id}/coi`, query: { depth: 6 } }, { enabled: !!animal })
     return <Flex w="full" h="full" direction="column" p="2" gap="2">
         {isPending && <Progress isIndeterminate />}
         {!isPending && error && <Flex direction="column" gap="2">
